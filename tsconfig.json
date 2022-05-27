@@ -6,7 +6,6 @@
     "esModuleInterop": true,
     "strict": false,
     "strictPropertyInitialization": false,
-    "compileOnSave": false,
     "importHelpers": true
   },
   "include": [
