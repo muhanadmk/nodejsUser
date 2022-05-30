@@ -1,5 +1,5 @@
 import { db } from '../db_connection/DbConnection';
-import { UserInterface } from '../types/User.interface';
+import { User } from '../types/User';
 import { Request, Response } from 'express';
 
 export class UserControllers {
@@ -9,11 +9,10 @@ export class UserControllers {
 
   public findALlUsers = async (req: Request, res: Response) => {
     try {
-      db.query('SELECT * FROM users', async (error, data, fields) => {
+      db.query('SELECT * FROM users', async (error, users, fields) => {
         if (error) {
           throw error
         }
-        const users: UserInterface[] = data;
         await res.status(200).json(users);
       })
     } catch (e) {
@@ -24,12 +23,11 @@ export class UserControllers {
   public findOneUser = async (req: Request, res: Response) => {
     const id: number = +req.params.id;
     try {
-      db.query(`SELECT * FROM users WHERE iduser =${id}`, async (error, data) => {
+      db.query(`SELECT * FROM users WHERE iduser =${id}`, async (error, user) => {
         if (error) {
           throw error
         }
-        const user: UserInterface = data;
-        await res.status(200).json(user);
+        await res.status(200).json(user[0]);
       })
     } catch (e) {
       res.status(500).send(e.message);
@@ -38,10 +36,9 @@ export class UserControllers {
 
   public createUser = async (req: Request, res: Response) => {
 
-    const newUser: UserInterface = {
+    const newUser: User = {
       ...req.body
     }
-
     try {
       db.query("INSERT INTO users SET ?", newUser, async (error, user) => {
         if (error) {
@@ -55,13 +52,11 @@ export class UserControllers {
   }
 
   public updateUser = async (req: Request, res: Response) => {
-    const id = +req.params.id;
     const modifUser = {
       ...req.body
     }
-    delete modifUser.iduser;
     try {
-      db.query("UPDATE users SET ? WHERE iduser = ?", [modifUser, id], async (error, user) => {
+      db.query("UPDATE users SET ? WHERE iduser = ?", [modifUser, modifUser.iduser], async (error, user) => {
         if (error) {
           throw error
         }
